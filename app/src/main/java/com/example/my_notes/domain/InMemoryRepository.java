@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import com.example.my_notes.db.DbManager;
@@ -20,20 +21,13 @@ public class InMemoryRepository implements NotesRepository {
 
     private final DbManager dbManager;
 
-/*    public List<Note> notes;
-
-    public List<Group> groups;*/
+    private  Context context;
 
     public InMemoryRepository(Context context) {
         dbManager = new DbManager(context);
         dbManager.openDb();
+        this.context = context;
     }
-
-//    @Override
-//    public List<Note> getAllNotes(long group_id) {
-//        notes = dbManager.getFromDb(group_id);
-//        return notes;
-//    }
 
     @Override
     public void getAllNotes(long group_id, Callback<List<Note>> callback) {
@@ -59,8 +53,8 @@ public class InMemoryRepository implements NotesRepository {
     }
 
     @Override
-    public void addGroup(Group group) {
-        dbManager.insertToDbGroup ( group );
+    public Group addGroup(Group group) {
+        return dbManager.insertToDbGroup ( group );
     }
 
     @Override
@@ -79,13 +73,15 @@ public class InMemoryRepository implements NotesRepository {
     }
 
     @Override
+    public void deleteIndex( long index ) {
+        executor.execute ( () -> dbManager.deleteEntry( index ) );
+    }
+
+    @Override
     public void upgradeNote(Note note) {
         dbManager.upgradeEntry(note);
     }
 
-    public void deleteIndex(long index) {
-        dbManager.deleteEntry(index);
-    }
 
     public void deleteIndexGroup(long index) {
         dbManager.deleteEntryGroup (index);
