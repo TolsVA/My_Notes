@@ -20,24 +20,8 @@ public class DbManager {
     private SQLiteDatabase db;
     Context context;
 
-
-    // Определить проекцию, указывающую, какие столбцы из базы данных
-    // вы фактически будете использовать после этого запроса.
-/*    String[] projection = {
-            BaseColumns._ID,
-            Constants.FeedEntryNote.NOTE_TITLE,
-            Constants.FeedEntryNote.NOTE_CONTENT,
-            Constants.FeedEntryNote.NOTE_DATA
-    };
-
-    //Отфильтровать результаты, WHERE "название" = "Мое название"
-    String selection = Constants.FeedEntryNote.NOTE_TITLE + " = ?";
-    String[] selectionArgs = { "My Title" };*/
-
-    // Как вы хотите, чтобы результаты сортировались в результирующем курсоре
     String sortOrder =
             Constants.FeedEntryNote.NOTE_ID + " DESC";
-
 
     public DbManager(Context context) {
         this.context = context;
@@ -58,18 +42,18 @@ public class DbManager {
         long newRowId = db.insert( Constants.FeedEntryNote.TABLE_NOTE, null, cv);
         cv.put( Constants.FeedEntryNote.NOTE_ID, newRowId);
 
-        note.setIndex(newRowId);
+        note.setId(newRowId);
         return note;
     }
 
     public void upgradeEntry(Note note) {
         ContentValues cv = new ContentValues();
-        cv.put( Constants.FeedEntryNote.NOTE_ID, note.getIndex());
+        cv.put( Constants.FeedEntryNote.NOTE_ID, note.getId());
         cv.put( Constants.FeedEntryNote.NOTE_TITLE, note.getTitle());
         cv.put( Constants.FeedEntryNote.NOTE_CONTENT, note.getText());
         cv.put( Constants.FeedEntryNote.NOTE_DATA, note.getData());
         cv.put( Constants.FeedEntryNote.NOTE_GROUP_ID, note.getGroup_id ());
-        String where = Constants.FeedEntryNote.NOTE_ID + "=" + note.getIndex();
+        String where = Constants.FeedEntryNote.NOTE_ID + "=" + note.getId();
         db.update( Constants.FeedEntryNote.TABLE_NOTE, cv, where, null);
     }
 

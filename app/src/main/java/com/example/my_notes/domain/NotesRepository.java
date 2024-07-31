@@ -4,13 +4,13 @@ import java.util.List;
 
 public interface NotesRepository {
 
-    List<Note> getAllNotes(long group_id);
+    void getAllNotes(long group_id, Callback<List<Note>> callback);
 
     List<Group> getAllGroup();
 
     void upgradeNote(Note note);
 
-    Note addNote(Note note);
+    void addNote(Note note);
 
     void clearDb();
 
@@ -22,7 +22,7 @@ public interface NotesRepository {
 
     List<Note> searchDb(String text);
 
-    Group addGroup(Group group);
+    void addGroup(Group group);
 
     int checkGroupForDbGroup(String text);
 

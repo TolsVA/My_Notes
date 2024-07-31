@@ -2,47 +2,65 @@ package com.example.my_notes.domain;
 
 import android.content.Context;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.RequiresApi;
-
 import com.example.my_notes.db.DbManager;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class InMemoryRepository implements NotesRepository {
 
+    private final Executor executor = Executors.newSingleThreadExecutor();
+
+    private final Handler handler = new Handler( Looper.getMainLooper());
+
     private final DbManager dbManager;
-//    private final DbManagerCroup dbManagerGroup;
 
-    public List<Note> notes;
+/*    public List<Note> notes;
 
-    public List<Group> groups;
+    public List<Group> groups;*/
 
     public InMemoryRepository(Context context) {
         dbManager = new DbManager(context);
         dbManager.openDb();
     }
 
+//    @Override
+//    public List<Note> getAllNotes(long group_id) {
+//        notes = dbManager.getFromDb(group_id);
+//        return notes;
+//    }
+
     @Override
-    public List<Note> getAllNotes(long group_id) {
-        notes = dbManager.getFromDb(group_id);
-        return notes;
+    public void getAllNotes(long group_id, Callback<List<Note>> callback) {
+        executor.execute( () -> {
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            handler.post( () -> callback.onSuccess(dbManager.getFromDb(group_id)) );
+        } );
     }
 
     @Override
     public List<Group> getAllGroup() {
-        groups = dbManager.getFromDbGroup ();
-        return groups;
+        return dbManager.getFromDbGroup ();
     }
 
     @Override
-    public Note addNote(Note note) {
-        return dbManager.insertToDbNote (note);
+    public void addNote(Note note) {
+        dbManager.insertToDbNote ( note );
     }
 
     @Override
-    public Group addGroup(Group group) {
-        return dbManager.insertToDbGroup (group);
+    public void addGroup(Group group) {
+        dbManager.insertToDbGroup ( group );
     }
 
     @Override
@@ -88,5 +106,4 @@ public class InMemoryRepository implements NotesRepository {
     public void deleteIndexNoteGroupId(long position) {
         dbManager.deleteIndexNoteGroupId(position);
     }
-
 }
